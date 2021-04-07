@@ -1,6 +1,6 @@
 # Visual Music
 
-####Visual Music is a project to visualize music. ####
+####Visual Music is a project to visualize music.
 
 For CS 126's three week final project, I will work on a 3D audio visualizer using SFML and Cinder OpenGL library.
 
