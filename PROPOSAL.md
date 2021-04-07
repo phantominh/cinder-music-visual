@@ -1,6 +1,6 @@
 # Visual Music
 
-####Visual Music is a project to visualize music.
+#### Visual Music is a project to visualize music.
 
 For CS 126's three week final project, I will work on a 3D audio visualizer using SFML and Cinder OpenGL library.
 
@@ -18,19 +18,19 @@ I'm not quite sure how much I can get done in 3 weeks, but I think only some bas
 * Be able to input an audio file (pick one - .WAV or .mp3).
 * Convert the audio to some type of Object. This might rely on research on external library (SFML).
 
-####Week 2:
+#### Week 2:
 * Work on some basic visualization for the audio file. Maybe the dummy one where there's a line representing the music pitch.
 
 ![img.png](dummy_audio_visual.png)
 
 * Think of how I want to represent it in 3D and start working on it.
 
-####Week 3:
+#### Week 3:
 * Get the 3D visualization done.
 * Check all tests for previous work.
 * Work on additional functions if time allows.
 
-####Possible Additional Features:
+#### Possible Additional Features:
 * Handle other audio types as well?
 * Add some user's interaction to the interface.
 
