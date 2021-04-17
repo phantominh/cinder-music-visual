@@ -55,7 +55,7 @@ void VoiceBasicProcessingApp::setup() {
 //        }
 //#endif
 //    });
-    audio::SourceFileRef sourceFile = audio::load(app::loadAsset("01 Ballade No. 1 in G Minor, Op. 23.m4a"));
+    audio::SourceFileRef sourceFile = audio::load(app::loadAsset("file_example_WAV_2MG.wav"));
     mVoice = audio::Voice::create(sourceFile);
     mVoice->start();
 }
@@ -80,4 +80,4 @@ void VoiceBasicProcessingApp::draw() {
     gl::clear(backgroundColor);
 }
 
-//CINDER_APP(VoiceBasicProcessingApp, RendererGl)
+CINDER_APP(VoiceBasicProcessingApp, RendererGl)
