@@ -49,22 +49,30 @@ get_filename_component(APP_PATH "${CMAKE_CURRENT_SOURCE_DIR}/" ABSOLUTE)
 
 include("${CINDER_PATH}/proj/cmake/modules/cinderMakeApp.cmake")
 
-list(APPEND SOURCE_FILES)
+list(APPEND SOURCE_FILES src/music_visual_app.cc)
 
 list(APPEND TEST_FILES)
 
 ci_make_app(
-        APP_NAME        visual-music
-        CINDER_PATH     ${CINDER_PATH}
-        SOURCES         apps/VoiceBasicProcessingApp.cc ${SOURCE_FILES}
-        CINDER_PATH     ${CINDER_PATH}
-        INCLUDES        include
+        APP_NAME voice-basic-processing
+        CINDER_PATH ${CINDER_PATH}
+        SOURCES apps/VoiceBasicProcessingApp.cc ${SOURCE_FILES}
+        CINDER_PATH ${CINDER_PATH}
+        INCLUDES include
 )
 
 ci_make_app(
-        APP_NAME        visual-music-test
-        CINDER_PATH     ${CINDER_PATH}
-        SOURCES         tests/test_main.cc ${SOURCE_FILES} ${TEST_FILES}
-        INCLUDES        include
-        LIBRARIES       catch2
+        APP_NAME visual-music
+        CINDER_PATH ${CINDER_PATH}
+        SOURCES apps/cinder_app_main.cc ${SOURCE_FILES}
+        CINDER_PATH ${CINDER_PATH}
+        INCLUDES include
+)
+
+ci_make_app(
+        APP_NAME visual-music-test
+        CINDER_PATH ${CINDER_PATH}
+        SOURCES tests/test_main.cc ${SOURCE_FILES} ${TEST_FILES}
+        INCLUDES include
+        LIBRARIES catch2
 )
