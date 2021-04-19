@@ -28,7 +28,7 @@ void MusicVisualApp::draw() {
   gl::clear();
   gl::enableAlphaBlending();
 
-  AppBase::draw();
+  DrawPlayPosition();
 }
 
 void MusicVisualApp::update() {
@@ -37,15 +37,33 @@ void MusicVisualApp::update() {
 
 void MusicVisualApp::keyDown(KeyEvent event) {
   if (event.getCode() == KeyEvent::KEY_SPACE) {
-    if (buffer_player_node_->isEnabled())
+    if (buffer_player_node_->isEnabled()) {
       buffer_player_node_->stop();
-    else
+    } else {
       buffer_player_node_->start();
+    }
   }
 }
 
 void MusicVisualApp::mouseDown(MouseEvent event) {
-  buffer_player_node_->start();
+  if (!buffer_player_node_->isEnabled()) {
+    buffer_player_node_->start();
+  }
+  buffer_player_node_->seekToTime(buffer_player_node_->getNumSeconds() *
+                                  static_cast<double>(event.getX()) /
+                                  static_cast<double>(getWindowWidth()));
+}
+
+void MusicVisualApp::DrawPlayPosition() {
+  // Draw current play position
+  float read_position =
+      static_cast<float>(getWindowWidth()) *
+      static_cast<float>(buffer_player_node_->getReadPosition()) /
+      static_cast<float>(buffer_player_node_->getNumFrames());
+
+  gl::color(Color::white());
+  gl::drawSolidRect(Rectf(read_position - 1, 0, read_position + 1,
+                          static_cast<float>(getWindowHeight())));
 }
 
 }  // namespace musicvisual
