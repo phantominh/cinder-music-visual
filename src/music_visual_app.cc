@@ -36,9 +36,8 @@ void MusicVisualApp::draw() {
   gl::clear();
   gl::enableAlphaBlending();
 
-//  DrawPlayPosition();
-
   visualizer_.DisplayAllAtFrame(buffer_player_node_->getReadPosition());
+  visualizer_.DrawPlayPosition(buffer_player_node_->getReadPosition());
 }
 
 void MusicVisualApp::update() {
@@ -65,18 +64,6 @@ void MusicVisualApp::mouseDrag(MouseEvent event) {
   buffer_player_node_->seekToTime(buffer_player_node_->getNumSeconds() *
                                   static_cast<double>(event.getX()) /
                                   static_cast<double>(getWindowWidth()));
-}
-
-void MusicVisualApp::DrawPlayPosition() {
-  // Draw current play position
-  float read_position =
-      static_cast<float>(getWindowWidth()) *
-      static_cast<float>(buffer_player_node_->getReadPosition()) /
-      static_cast<float>(buffer_player_node_->getNumFrames());
-
-  gl::color(Color::white());
-  gl::drawSolidRect(Rectf(read_position - 2, static_cast<float>(getWindowHeight()/2), read_position + 2,
-                          static_cast<float>(getWindowHeight())));
 }
 
 }  // namespace musicvisual

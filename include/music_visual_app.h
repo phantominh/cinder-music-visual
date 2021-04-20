@@ -1,13 +1,11 @@
 #pragma once
 
+#include "audio_visualizer.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
-#include "cinder/gl/gl.h"
-
-#include "cinder/audio/audio.h"
 #include "cinder/audio/Voice.h"
-
-#include "audio_buffer_visualizer.h"
+#include "cinder/audio/audio.h"
+#include "cinder/gl/gl.h"
 
 namespace musicvisual {
 
@@ -48,18 +46,14 @@ class MusicVisualApp : public App {
   void mouseDrag( MouseEvent event ) override;
 
   //TODO: Feel free to change these variables
-  const double kWindowSize = 875;
-  const double kMargin = 100;
+  const float kWindowSize = 875;
+  const float kMargin = 100;
 
  private:
   // Node for sample audio playback
   audio::BufferPlayerNodeRef buffer_player_node_;
-  AudioBufferVisualizer visualizer_;
+  AudioVisualizer visualizer_;
   size_t last_saved_frame_;
-  /**
-   * Draw current play position
-   */
-   void DrawPlayPosition();
 };
 
 }  // namespace musicvisual

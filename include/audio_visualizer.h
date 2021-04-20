@@ -12,28 +12,37 @@ namespace musicvisual {
 using namespace ci;
 using namespace ci::app;
 
-class AudioBufferVisualizer {
+/**
+ * This class visualizes the audio buffer
+ */
+class AudioVisualizer {
  public:
-  AudioBufferVisualizer();
+  /**
+   * Initialize the visualizer
+   */
+  AudioVisualizer();
 
+  /**
+   * Load audio buffer and bounds of the visualizer
+   * @param buffer
+   * @param bounds
+   */
   void Load(const audio::Buffer &buffer, const Rectf &bounds);
 
   /**
    * Display all data at a specific frame
    * @param frame
    */
-  void DisplayAtFrame(const size_t& frame) const;
+  void DisplayAllAtFrame(const size_t &frame) const;
 
   /**
-   * Display all data at a specific frame
-   * @param frame
+   * Draw current play position
    */
-  void DisplayAllAtFrame(const size_t& frame) const;
+  void DrawPlayPosition(const size_t &frame) const;
 
  private:
   audio::Buffer buffer_;
   Rectf bounds_;
-  std::vector<PolyLine2f> waveforms_;
 };
 
 }
