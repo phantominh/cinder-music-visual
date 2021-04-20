@@ -14,14 +14,20 @@ void MusicVisualApp::setup() {
                   ctx->getSampleRate());
 
   // Initialize the buffer player node
+  // FIXME: Using buffer takes a long time to handle larger recordings (consider
+  // using FilePlayer for larger recordings?)
   buffer_player_node_ = ctx->makeNode(new audio::BufferPlayerNode());
   buffer_player_node_->loadBuffer(source_file);
 
   // Connect nodes and context
   buffer_player_node_ >> ctx->getOutput();
 
+  visualizer_.Load(*buffer_player_node_->getBuffer(), getWindowBounds());
+
+  // Enable
   buffer_player_node_->enable();
   ctx->enable();
+
 }
 
 void MusicVisualApp::draw() {
@@ -29,6 +35,7 @@ void MusicVisualApp::draw() {
   gl::enableAlphaBlending();
 
   DrawPlayPosition();
+  visualizer_.DisplayAllAtFrame(buffer_player_node_->getReadPosition());
 }
 
 void MusicVisualApp::update() {
@@ -45,7 +52,7 @@ void MusicVisualApp::keyDown(KeyEvent event) {
   }
 }
 
-void MusicVisualApp::mouseDown(MouseEvent event) {
+void MusicVisualApp::mouseDrag(MouseEvent event) {
   if (!buffer_player_node_->isEnabled()) {
     buffer_player_node_->start();
   }
@@ -64,6 +71,10 @@ void MusicVisualApp::DrawPlayPosition() {
   gl::color(Color::white());
   gl::drawSolidRect(Rectf(read_position - 1, 0, read_position + 1,
                           static_cast<float>(getWindowHeight())));
+  //TODO: Delete the code below
+//  ci::gl::drawStringCentered(
+//      "NumChannels: " + std::to_string(buffer_player_node_->getNumChannels()),
+//      getWindowCenter(), ci::Color("blue"));
 }
 
 }  // namespace musicvisual

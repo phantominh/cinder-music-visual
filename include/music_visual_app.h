@@ -7,6 +7,8 @@
 #include "cinder/audio/audio.h"
 #include "cinder/audio/Voice.h"
 
+#include "audio_buffer_visualizer.h"
+
 namespace musicvisual {
 
 using namespace ci;
@@ -43,11 +45,12 @@ class MusicVisualApp : public App {
   /**
    * Handle mouse input
    */
-  void mouseDown( MouseEvent event ) override;
+  void mouseDrag( MouseEvent event ) override;
 
  private:
   // Node for sample audio playback
   audio::BufferPlayerNodeRef buffer_player_node_;
+  AudioBufferVisualizer visualizer_;
 
   /**
    * Draw current play position
