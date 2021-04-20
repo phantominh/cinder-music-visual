@@ -47,11 +47,15 @@ class MusicVisualApp : public App {
    */
   void mouseDrag( MouseEvent event ) override;
 
+  //TODO: Feel free to change these variables
+  const double kWindowSize = 875;
+  const double kMargin = 100;
+
  private:
   // Node for sample audio playback
   audio::BufferPlayerNodeRef buffer_player_node_;
   AudioBufferVisualizer visualizer_;
-
+  size_t last_saved_frame_;
   /**
    * Draw current play position
    */

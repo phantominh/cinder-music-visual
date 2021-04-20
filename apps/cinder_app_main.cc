@@ -2,6 +2,10 @@
 
 using musicvisual::MusicVisualApp;
 
+void prepareSettings(MusicVisualApp::Settings* settings) {
+  settings->setResizable(false);
+}
+
 // This line is a macro that expands into an "int main()" function.
-CINDER_APP(MusicVisualApp, ci::app::RendererGl);
+CINDER_APP(MusicVisualApp, ci::app::RendererGl, prepareSettings);
 

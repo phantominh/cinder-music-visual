@@ -22,11 +22,18 @@ class AudioBufferVisualizer {
    * Display all data at a specific frame
    * @param frame
    */
+  void DisplayAtFrame(const size_t& frame) const;
+
+  /**
+   * Display all data at a specific frame
+   * @param frame
+   */
   void DisplayAllAtFrame(const size_t& frame) const;
 
  private:
   audio::Buffer buffer_;
   Rectf bounds_;
+  std::vector<PolyLine2f> waveforms_;
 };
 
 }
