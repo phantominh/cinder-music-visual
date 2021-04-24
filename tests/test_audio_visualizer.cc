@@ -14,10 +14,11 @@ TEST_CASE("Test CalculateInstantGraphInTimeDomain") {
   arr_ptr[1] = 0.5f;
 
   // Use the calculation method to transform the array
-  std::vector<vec2> graph_data = visualizer.CalculateInstantGraphInTimeDomain(arr_ptr, 0).getPoints();
+  std::vector<vec2> graph_data =
+      visualizer.CalculateInstantGraphInTimeDomain(arr_ptr, 0).getPoints();
 
   REQUIRE(Approx(graph_data[0].x).epsilon(0.001) == 0);
-  REQUIRE(Approx(graph_data[0].y).epsilon(0.001) ==  9.1);
+  REQUIRE(Approx(graph_data[0].y).epsilon(0.001) == 9.1);
   REQUIRE(Approx(graph_data[1].x).epsilon(0.001) == 5);
   REQUIRE(Approx(graph_data[1].y).epsilon(0.001) == (10 - 0.25f * 2));
 
