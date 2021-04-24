@@ -19,6 +19,7 @@ class AudioVisualizer {
  public:
   /**
    * Initialize the visualizer
+   *
    */
   AudioVisualizer();
 
@@ -26,23 +27,38 @@ class AudioVisualizer {
    * Load audio buffer and bounds of the visualizer
    * @param buffer
    * @param bounds
+   * @param sample_rate
    */
-  void Load(const audio::Buffer &buffer, const Rectf &bounds);
+  void Load(const audio::Buffer &buffer, const Rectf &bounds, const size_t &sample_rate);
 
   /**
-   * Display all data at a specific frame
+   * Display the general audio magnitude in time domain at a specific frame
    * @param frame
    */
-  void DisplayAllAtFrame(const size_t &frame) const;
+  void DisplayGeneralMagnitudeInTimeDomain(const size_t &frame) const;
 
   /**
-   * Draw current play position
+   * Display current play position
+   * @param frame
    */
-  void DrawPlayPosition(const size_t &frame) const;
+  void DisplayPosition(const size_t &frame) const;
+
+  /**
+   * Returns a graph that represent the instant data at current frame (time domain).
+   * @param data
+   * @param frame
+   * @return PolyLine2f
+   */
+  auto CalculateInstantGraphInTimeDomain(const float *data, const size_t& frame) const -> PolyLine2f;
 
  private:
   audio::Buffer buffer_;
   Rectf bounds_;
+
+  // Number of frames per second
+  size_t sample_rate_;
+
+  float display_rate_time_domain = 50;
 };
 
-}
+}  // namespace musicvisual

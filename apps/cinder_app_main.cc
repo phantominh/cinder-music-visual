@@ -3,7 +3,7 @@
 using musicvisual::MusicVisualApp;
 
 void prepareSettings(MusicVisualApp::Settings* settings) {
-  settings->setResizable(false);
+  settings->setFullScreen();
 }
 
 // This line is a macro that expands into an "int main()" function.

@@ -42,18 +42,18 @@ class MusicVisualApp : public App {
 
   /**
    * Handle mouse input
+   * @param event
    */
   void mouseDrag( MouseEvent event ) override;
-
-  //TODO: Feel free to change these variables
-  const float kWindowSize = 875;
-  const float kMargin = 100;
 
  private:
   // Node for sample audio playback
   audio::BufferPlayerNodeRef buffer_player_node_;
-  AudioVisualizer visualizer_;
   size_t last_saved_frame_;
+
+  AudioVisualizer visualizer_;
+
+  void DisplayInfoBoard();
 };
 
 }  // namespace musicvisual
