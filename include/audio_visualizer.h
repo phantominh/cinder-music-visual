@@ -29,19 +29,25 @@ class AudioVisualizer {
    * @param sample_rate
    * @param display_rate_time_domain
    */
-  void Load(const audio::Buffer &buffer, const Rectf &bounds, const size_t &sample_rate, const float &display_rate_time_domain  = 50);
+  void Load(const audio::Buffer &buffer, const Rectf &bounds, const size_t &sample_rate, const float &display_rate_time_domain  = 20);
 
   /**
-   * Display the general audio magnitude in time domain at a specific frame
+   * Display the instant audio magnitude in time domain at a specific frame
    * @param frame
    */
-  void DisplayGeneralMagnitudeInTimeDomain(const size_t &frame) const;
+  void DisplayInstantMagnitudeInTimeDomain(const size_t &frame) const;
 
   /**
    * Display current play position
    * @param frame
    */
   void DisplayPosition(const size_t &frame) const;
+
+  /**
+   * Display the general magnitude in time domain at a specific frame
+   * @param frame
+   */
+  void DisplayGeneralMagnitudeInTimeDomain(const size_t &frame) const;
 
   /**
    * Returns a graph that represent the instant data at current frame (time domain).
@@ -51,14 +57,27 @@ class AudioVisualizer {
    */
   PolyLine2f CalculateInstantGraphInTimeDomain(const float *data, const size_t& frame) const;
 
+  /**
+   * Compress the buffer to data per second
+   */
+   // FIXME: Make this more flexible in the future
+  void ConstructCompressedBuffer();
+
  private:
   audio::Buffer buffer_;
   Rectf bounds_;
 
-  // Number of frames per second
-  size_t sample_rate_;
+  size_t sample_rate_;   // Number of frames per second
+  float display_rate_time_domain_; // Rate of instant display (time domain)
 
-  float display_rate_time_domain_;
+  std::vector<float> compressed_buffer_; // The compressed version of buffer
+
+  const float kMargin = 100;
+
+  // Graph boundaries
+  Rectf general_time_domain_graph_bound_;
+  Rectf instant_time_domain_graph_bound_;
+
 
   /**
    * Convert the magnitude to a displayable ratio. Magnitude range: [-1, 1]

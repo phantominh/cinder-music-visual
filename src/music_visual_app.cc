@@ -28,8 +28,9 @@ void MusicVisualApp::draw() {
   gl::clear();
   gl::enableAlphaBlending();
 
-  visualizer_.DisplayGeneralMagnitudeInTimeDomain(last_saved_frame_);
+  visualizer_.DisplayInstantMagnitudeInTimeDomain(last_saved_frame_);
   visualizer_.DisplayPosition(last_saved_frame_);
+  visualizer_.DisplayGeneralMagnitudeInTimeDomain(last_saved_frame_);
 
   DisplayInfoBoard();
 }
