@@ -61,12 +61,20 @@ void MusicVisualApp::mouseDrag(MouseEvent event) {
 }
 
 void MusicVisualApp::DisplayInfoBoard() {
-  std::string output = "play_time: " + std::to_string(static_cast<float>(last_saved_frame_) / buffer_player_node_->getSampleRate()) + "/" + std::to_string(buffer_player_node_->getNumSeconds());
+  // Display time
+  std::string output = "time: " + std::to_string(static_cast<float>(last_saved_frame_) / buffer_player_node_->getSampleRate()) + "/" + std::to_string(buffer_player_node_->getNumSeconds());
   gl::drawStringRight(output, vec2(getWindowBounds().getX2() - 20, getWindowBounds().getY2() - 40),
                       Color("white"));
   gl::drawStringRight("sample_rate: " + std::to_string(buffer_player_node_->getSampleRate()) + " fps", vec2(getWindowBounds().getX2() - 20, getWindowBounds().getY2() - 60),
                       Color("white"));
 
+  // Display frame
+  output = "frame: " + std::to_string(buffer_player_node_->getReadPosition()) + "/" +
+                       std::to_string(buffer_player_node_->getNumFrames());
+  gl::drawStringRight(output, vec2(getWindowBounds().getX2() - 20, getWindowBounds().getY2() - 20),
+                      Color("white"));
+
+  // Display state
   std::string state = "playing";
   if (!buffer_player_node_->isEnabled()) {
     state = "paused";

@@ -19,7 +19,6 @@ class AudioVisualizer {
  public:
   /**
    * Initialize the visualizer
-   *
    */
   AudioVisualizer();
 
@@ -28,8 +27,9 @@ class AudioVisualizer {
    * @param buffer
    * @param bounds
    * @param sample_rate
+   * @param display_rate_time_domain
    */
-  void Load(const audio::Buffer &buffer, const Rectf &bounds, const size_t &sample_rate);
+  void Load(const audio::Buffer &buffer, const Rectf &bounds, const size_t &sample_rate, const float &display_rate_time_domain  = 50);
 
   /**
    * Display the general audio magnitude in time domain at a specific frame
@@ -49,7 +49,7 @@ class AudioVisualizer {
    * @param frame
    * @return PolyLine2f
    */
-  auto CalculateInstantGraphInTimeDomain(const float *data, const size_t& frame) const -> PolyLine2f;
+  PolyLine2f CalculateInstantGraphInTimeDomain(const float *data, const size_t& frame) const;
 
  private:
   audio::Buffer buffer_;
@@ -58,7 +58,14 @@ class AudioVisualizer {
   // Number of frames per second
   size_t sample_rate_;
 
-  float display_rate_time_domain = 50;
+  float display_rate_time_domain_;
+
+  /**
+   * Convert the magnitude to a displayable ratio. Magnitude range: [-1, 1]
+   * @param magnitude
+   * @return
+   */
+  auto ConvertMagnitudeToDisplayableRatio(const float &magnitude) const -> float;
 };
 
 }  // namespace musicvisual

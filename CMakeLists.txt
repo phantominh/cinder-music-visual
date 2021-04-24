@@ -52,7 +52,7 @@ include("${CINDER_PATH}/proj/cmake/modules/cinderMakeApp.cmake")
 list(APPEND SOURCE_FILES src/music_visual_app.cc
         src/audio_visualizer.cc)
 
-list(APPEND TEST_FILES)
+list(APPEND TEST_FILES tests/test_audio_visualizer.cc)
 
 ci_make_app(
         APP_NAME visual-music
@@ -69,3 +69,7 @@ ci_make_app(
         INCLUDES include
         LIBRARIES catch2
 )
+
+if(MSVC)
+    set_property(TARGET visual-music-test APPEND_STRING PROPERTY LINK_FLAGS " /SUBSYSTEM:CONSOLE")
+endif()
