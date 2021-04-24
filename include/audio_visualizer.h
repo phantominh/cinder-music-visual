@@ -35,16 +35,16 @@ class AudioVisualizer {
             const size_t &general_display_rate_time_domain = 100);
 
   /**
+   * Display everything inside the visualizer at a specific frame
+   * @param frame
+   */
+  void Display(const size_t &frame) const;
+
+  /**
    * Display the instant audio magnitude in time domain at a specific frame
    * @param frame
    */
   void DisplayInstantMagnitudeInTimeDomain(const size_t &frame) const;
-
-  /**
-   * Display current play position
-   * @param frame
-   */
-  void DisplayPosition(const size_t &frame) const;
 
   /**
    * Display the general magnitude in time domain at a specific frame
@@ -63,15 +63,6 @@ class AudioVisualizer {
                                          const size_t &frame) const
       -> PolyLine2f;
 
-  /**
-   * Compress the buffer to data per second
-   */
-  void ConstructCompressedBuffer();
-
-  auto FindMaximumMagnitude(const audio::Buffer &buffer) const -> float;
-
-  auto FindMaximumMagnitude(const std::vector<float> &buffer) const -> float;
-
  private:
   audio::Buffer buffer_;
   Rectf bounds_;
@@ -83,8 +74,6 @@ class AudioVisualizer {
                                              // domain)
 
   std::vector<float> compressed_buffer_;  // The compressed version of buffer
-
-  const float kMargin = 50;
 
   // Graph boundaries
   Rectf instant_time_domain_graph_bounds_;
@@ -102,6 +91,25 @@ class AudioVisualizer {
   auto ConvertMagnitudeToDisplayableRatio(const float &magnitude,
                                           const float &max_magnitude) const
       -> float;
+
+  /**
+   * Compress the buffer to data per range
+   */
+  void ConstructCompressedBuffer();
+
+  /**
+   * Find the maximum magnitude
+   * @param buffer
+   * @return max magnitude
+   */
+  auto FindMaximumMagnitude(const audio::Buffer &buffer) const -> float;
+
+  /**
+   * Find the maximum magnitude
+   * @param buffer
+   * @return max magnitude
+   */
+  auto FindMaximumMagnitude(const std::vector<float> &buffer) const -> float;
 };
 
 }  // namespace musicvisual

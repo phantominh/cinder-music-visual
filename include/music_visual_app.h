@@ -51,8 +51,13 @@ class MusicVisualApp : public App {
   audio::BufferPlayerNodeRef buffer_player_node_;
   size_t last_saved_frame_;
 
+  const float kMargin = 50;
+
   AudioVisualizer visualizer_;
 
+  /**
+   * Display the info board, including: time, frame, fps, etc
+   */
   void DisplayInfoBoard();
 };
 
