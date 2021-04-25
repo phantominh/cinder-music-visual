@@ -9,7 +9,7 @@ void MusicVisualApp::setup() {
 
   // Create a source file and set its output sample rate to match the context
   audio::SourceFileRef source_file =
-      audio::load(app::loadAsset("01 Ballade No. 1 in G Minor, Op. 23.m4a"),
+      audio::load(app::loadAsset("12 Liebesleid (Love's Sorrow).m4a"),
                   ctx->getSampleRate());
 
   // Initialize the buffer player node

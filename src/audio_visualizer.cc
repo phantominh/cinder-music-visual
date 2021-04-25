@@ -186,4 +186,8 @@ auto AudioVisualizer::FindMaximumMagnitude(
   return max_magnitude;
 }
 
+void AudioVisualizer::SetMaxMagnitude(const float& magnitude) {
+  max_magnitude_ = magnitude;
+}
+
 }  // namespace musicvisual

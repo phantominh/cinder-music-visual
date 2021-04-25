@@ -41,18 +41,6 @@ class AudioVisualizer {
   void Display(const size_t &frame) const;
 
   /**
-   * Display the instant audio magnitude in time domain at a specific frame
-   * @param frame
-   */
-  void DisplayInstantMagnitudeInTimeDomain(const size_t &frame) const;
-
-  /**
-   * Display the general magnitude in time domain at a specific frame
-   * @param frame
-   */
-  void DisplayGeneralMagnitudeInTimeDomain(const size_t &frame) const;
-
-  /**
    * Returns a graph that represent the instant data at current frame (time
    * domain).
    * @param data
@@ -63,6 +51,11 @@ class AudioVisualizer {
                                          const size_t &frame) const
       -> PolyLine2f;
 
+  /**
+   * Set a custom maximum magnitude
+   * @param magnitude
+   */
+  void SetMaxMagnitude(const float &magnitude);
  private:
   audio::Buffer buffer_;
   Rectf bounds_;
@@ -84,9 +77,21 @@ class AudioVisualizer {
   float max_magnitude_compressed_;
 
   /**
+   * Display the instant audio magnitude in time domain at a specific frame
+   * @param frame
+   */
+  void DisplayInstantMagnitudeInTimeDomain(const size_t &frame) const;
+
+  /**
+   * Display the general magnitude in time domain at a specific frame
+   * @param frame
+   */
+  void DisplayGeneralMagnitudeInTimeDomain(const size_t &frame) const;
+
+  /**
    * Convert the magnitude to a displayable ratio. Magnitude range: [-1, 1]
    * @param magnitude
-   * @return
+   * @return a variable proportional to the display screen
    */
   auto ConvertMagnitudeToDisplayableRatio(const float &magnitude,
                                           const float &max_magnitude) const
