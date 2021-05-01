@@ -5,7 +5,7 @@
 using namespace ci;
 
 TEST_CASE("Test CalculateInstantGraphInTimeDomain") {
-  musicvisual::AudioVisualizer visualizer;
+  visualmusic::AudioVisualizer visualizer;
   visualizer.Load(audio::Buffer(2, 2), Rectf(vec2(0, 0), vec2(10, 10)), 3, 1,
                   1);
 

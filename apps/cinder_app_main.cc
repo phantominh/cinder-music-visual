@@ -1,6 +1,6 @@
 #include "music_visual_app.h"
 
-using musicvisual::MusicVisualApp;
+using visualmusic::MusicVisualApp;
 
 void prepareSettings(MusicVisualApp::Settings* settings) {
   settings->setFullScreen();

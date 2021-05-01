@@ -6,7 +6,7 @@
 #include "cinder/audio/audio.h"
 #include "cinder/gl/gl.h"
 
-namespace musicvisual {
+namespace visualmusic {
 
 using namespace ci;
 using namespace ci::app;
@@ -52,12 +52,45 @@ class AudioVisualizer {
       -> PolyLine2f;
 
   /**
+   * Returns a graph that represent the instant data at current frame (time
+   * domain).
+   * @param frame
+   * @return PolyLine2f
+   */
+  auto CalculateGeneralGraphInTimeDomain(const size_t &frame) const
+      -> PolyLine2f;
+
+  /**
+   * Returns a frequency graph at index (frame / frequency_range)
+   * @param frame
+   * @return
+   */
+  auto CalculateInstantGraphInFrequencyDomain(const size_t &frame,
+                                              const Rectf &bounds) const
+      -> PolyLine2f;
+
+  /**
+   * Compress the buffer to data per range
+   */
+  // TODO: Find a way to test this function
+  void ConstructCompressedBuffer();
+
+  /**
+   * Construct an array of buffer spectral (Frequency Domain)
+   * @param fft_size Size of Fft for transformation from time domain to
+   * frequency domain
+   */
+  void ConstructBufferSpectralArray(const size_t &fft_size);
+
+  /**
    * Set a custom maximum magnitude
    * @param magnitude
    */
   void SetMaxMagnitude(const float &magnitude);
+
  private:
   audio::Buffer buffer_;
+  std::vector<audio::BufferSpectral *> buffer_spectral_arr_;
   Rectf bounds_;
 
   size_t sample_rate_;                       // Number of frames per second
@@ -71,22 +104,33 @@ class AudioVisualizer {
   // Graph boundaries
   Rectf instant_time_domain_graph_bounds_;
   Rectf general_time_domain_graph_bounds_;
+  Rectf three_dimension_graph_bounds_;
 
   // Maximum magnitudes
-  float max_magnitude_;
+  float max_magnitude_general_;
   float max_magnitude_compressed_;
+
+  // Frequency range
+  const size_t kFrequencyRange = static_cast<size_t>(pow(2, 15));
+  const size_t kMaxMagnitude = 1;
 
   /**
    * Display the instant audio magnitude in time domain at a specific frame
    * @param frame
    */
-  void DisplayInstantMagnitudeInTimeDomain(const size_t &frame) const;
+  void DisplayInstantGraphInTimeDomain(const size_t &frame) const;
 
   /**
    * Display the general magnitude in time domain at a specific frame
    * @param frame
    */
-  void DisplayGeneralMagnitudeInTimeDomain(const size_t &frame) const;
+  void DisplayGeneralGraphInTimeDomain(const size_t &frame) const;
+
+  /**
+   * Display the 3d audio graph - frequency & time domain
+   * @param frame
+   */
+  void Display3DGraph(const size_t &frame) const;
 
   /**
    * Convert the magnitude to a displayable ratio. Magnitude range: [-1, 1]
@@ -96,11 +140,6 @@ class AudioVisualizer {
   auto ConvertMagnitudeToDisplayableRatio(const float &magnitude,
                                           const float &max_magnitude) const
       -> float;
-
-  /**
-   * Compress the buffer to data per range
-   */
-  void ConstructCompressedBuffer();
 
   /**
    * Find the maximum magnitude
@@ -115,6 +154,14 @@ class AudioVisualizer {
    * @return max magnitude
    */
   auto FindMaximumMagnitude(const std::vector<float> &buffer) const -> float;
+
+  /**
+   * Divide buffer data into smaller buffers (per second)
+   * @param range_size
+   * @return list of smaller buffers
+   */
+  auto GenerateBufferPerRange(const size_t &range_size) const
+      -> std::vector<audio::Buffer *>;
 };
 
-}  // namespace musicvisual
+}  // namespace visualmusic

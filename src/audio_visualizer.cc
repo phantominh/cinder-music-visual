@@ -1,6 +1,6 @@
 #include "audio_visualizer.h"
 
-namespace musicvisual {
+namespace visualmusic {
 
 AudioVisualizer::AudioVisualizer() = default;
 
@@ -18,23 +18,29 @@ void AudioVisualizer::Load(const audio::Buffer& buffer, const Rectf& bounds,
 
   // Boundaries
   general_time_domain_graph_bounds_ = Rectf(
-      vec2(bounds_.getX1(), bounds_.getY1() + bounds_.getHeight() * 6 / 10),
+      vec2(bounds_.getX1(), bounds_.getY1() + bounds_.getHeight() * 5.5 / 10),
       vec2(bounds_.getX2(), bounds_.getY1() + bounds_.getHeight() * 8 / 10));
   instant_time_domain_graph_bounds_ = Rectf(
       vec2(bounds_.getX1(), bounds_.getY1() + bounds_.getHeight() * 8.2 / 10),
       vec2(bounds_.getX2(), bounds_.getY1() + bounds_.getHeight() * 9.2 / 10));
+  three_dimension_graph_bounds_ = Rectf(
+      vec2(bounds_.getX1(), bounds_.getY1() + bounds_.getHeight() * 0.5 / 10),
+      vec2(bounds_.getX2(), bounds_.getY1() + bounds_.getHeight() * 5.3 / 10));
 
   ConstructCompressedBuffer();
-  max_magnitude_ = FindMaximumMagnitude(buffer_);
+  max_magnitude_general_ = FindMaximumMagnitude(buffer_);
   max_magnitude_compressed_ = FindMaximumMagnitude(compressed_buffer_);
+
+  ConstructBufferSpectralArray(kFrequencyRange);
 }
 
 void AudioVisualizer::Display(const size_t& frame) const {
-  DisplayInstantMagnitudeInTimeDomain(frame);
-  DisplayGeneralMagnitudeInTimeDomain(frame);
+  DisplayInstantGraphInTimeDomain(frame);
+  DisplayGeneralGraphInTimeDomain(frame);
+  Display3DGraph(frame);
 }
 
-void AudioVisualizer::DisplayInstantMagnitudeInTimeDomain(
+void AudioVisualizer::DisplayInstantGraphInTimeDomain(
     const size_t& frame) const {
   // Color only has effect in this scope
   gl::ScopedGlslProg glslScope(getStockShader(gl::ShaderDef().color()));
@@ -68,17 +74,20 @@ auto AudioVisualizer::CalculateInstantGraphInTimeDomain(
   float x = instant_time_domain_graph_bounds_.x1;
 
   // Construct the graph out of the buffers
-  for (size_t f = frame; f < frame + sample_rate_ / static_cast<size_t>(instant_time_domain_display_rate_); f++) {
+  for (size_t f = frame;
+       f < frame + sample_rate_ /
+                       static_cast<size_t>(instant_time_domain_display_rate_);
+       f++) {
     float y;
 
     // Handle edge case: The final frames
     if (f >= buffer_.getNumFrames()) {
       y = instant_time_domain_graph_bounds_.y2 -
-          ConvertMagnitudeToDisplayableRatio(0.0f, max_magnitude_) *
+          ConvertMagnitudeToDisplayableRatio(0.0f, max_magnitude_general_) *
               wave_height;
     } else {
       y = instant_time_domain_graph_bounds_.y2 -
-          ConvertMagnitudeToDisplayableRatio(data[f], max_magnitude_) *
+          ConvertMagnitudeToDisplayableRatio(data[f], max_magnitude_general_) *
               wave_height;
     }
 
@@ -89,7 +98,7 @@ auto AudioVisualizer::CalculateInstantGraphInTimeDomain(
   return waveform;
 }
 
-void AudioVisualizer::DisplayGeneralMagnitudeInTimeDomain(
+void AudioVisualizer::DisplayGeneralGraphInTimeDomain(
     const size_t& frame) const {
   // Color only has effect in this scope
   gl::ScopedGlslProg glslScope(getStockShader(gl::ShaderDef().color()));
@@ -99,6 +108,26 @@ void AudioVisualizer::DisplayGeneralMagnitudeInTimeDomain(
   gl::drawStrokedRect(general_time_domain_graph_bounds_);
 
   // Init the graph
+  PolyLine2f waveform = CalculateGeneralGraphInTimeDomain(frame);
+
+  if (!waveform.getPoints().empty()) {
+    gl::draw(waveform);
+  }
+
+  // Display current playtime
+  const float x_scale = general_time_domain_graph_bounds_.getWidth() /
+                        (static_cast<float>(compressed_buffer_.size()));
+  gl::color(Color("red"));
+  auto last_iter = --waveform.end();
+
+  gl::drawStrokedRect(
+      Rectf(last_iter->x, general_time_domain_graph_bounds_.getY1(),
+            last_iter->x + x_scale, general_time_domain_graph_bounds_.getY2()));
+}
+
+auto AudioVisualizer::CalculateGeneralGraphInTimeDomain(
+    const size_t& frame) const -> PolyLine2f {
+  // Init the graph
   PolyLine2f waveform = PolyLine2f();
   const float wave_height = general_time_domain_graph_bounds_.getHeight();
   const float x_scale = general_time_domain_graph_bounds_.getWidth() /
@@ -106,7 +135,8 @@ void AudioVisualizer::DisplayGeneralMagnitudeInTimeDomain(
   float x = general_time_domain_graph_bounds_.x1;
 
   // Construct the graph
-  for (size_t f = 0; f < (frame / (sample_rate_ / general_time_domain_display_rate_)); f++) {
+  for (size_t f = 0;
+       f < (frame / (sample_rate_ / general_time_domain_display_rate_)); f++) {
     float y;
 
     y = general_time_domain_graph_bounds_.y2 -
@@ -118,20 +148,7 @@ void AudioVisualizer::DisplayGeneralMagnitudeInTimeDomain(
     x += x_scale;
   }
 
-  if (!waveform.getPoints().empty()) {
-    gl::draw(waveform);
-  }
-
-  // Display current playtime
-  gl::color(Color("red"));
-  gl::drawStrokedRect(Rectf(x, general_time_domain_graph_bounds_.getY1(),
-                            x + x_scale,
-                            general_time_domain_graph_bounds_.getY2()));
-}
-
-auto AudioVisualizer::ConvertMagnitudeToDisplayableRatio(
-    const float& magnitude, const float& max_magnitude) const -> float {
-  return 0.5f * (1 - magnitude / max_magnitude);
+  return waveform;
 }
 
 void AudioVisualizer::ConstructCompressedBuffer() {
@@ -164,6 +181,61 @@ void AudioVisualizer::ConstructCompressedBuffer() {
   }
 }
 
+void AudioVisualizer::Display3DGraph(const size_t& frame) const {
+  // Color only has effect in this scope
+  gl::ScopedGlslProg glslScope(getStockShader(gl::ShaderDef().color()));
+  gl::color(Color("white"));
+
+  // Display border
+  gl::drawStrokedRect(three_dimension_graph_bounds_);
+
+}
+
+auto AudioVisualizer::CalculateInstantGraphInFrequencyDomain(
+    const size_t& frame, const Rectf& bounds) const -> PolyLine2f {
+  // Init the graph
+  PolyLine2f waveform = PolyLine2f();
+  const float wave_height = bounds.getHeight();
+  const float x_scale = bounds.getWidth() / static_cast<float>(kFrequencyRange);
+  float x = bounds.x1;
+
+  float *buffer = buffer_spectral_arr_[frame / kFrequencyRange]->getData();
+
+  // Construct the graph
+  for (size_t f = 0; f < kFrequencyRange; f++) {
+    float y;
+
+    y = bounds.y2 -
+        ConvertMagnitudeToDisplayableRatio(buffer[f], static_cast<float>(kMaxMagnitude)) * wave_height;
+
+    waveform.push_back(vec2(x, y));
+    x += x_scale;
+  }
+
+  return waveform;
+}
+
+void AudioVisualizer::ConstructBufferSpectralArray(const size_t& fft_size) {
+  if (!isPowerOf2(fft_size)) {
+    throw std::invalid_argument("Range must be a power of 2");
+  }
+
+  std::vector<audio::Buffer*> buffer_arr = GenerateBufferPerRange(fft_size);
+  audio::dsp::Fft fft = audio::dsp::Fft(fft_size);
+  audio::BufferSpectral* temp;
+
+  for (auto& buffer : buffer_arr) {
+    temp = new audio::BufferSpectral(fft_size);
+    fft.forward(buffer, temp);
+    buffer_spectral_arr_.push_back(temp);
+  }
+}
+
+auto AudioVisualizer::ConvertMagnitudeToDisplayableRatio(
+    const float& magnitude, const float& max_magnitude) const -> float {
+  return 0.5f * (1 - magnitude / max_magnitude);
+}
+
 auto AudioVisualizer::FindMaximumMagnitude(const audio::Buffer& buffer) const
     -> float {
   float max_magnitude = 0;
@@ -187,7 +259,34 @@ auto AudioVisualizer::FindMaximumMagnitude(
 }
 
 void AudioVisualizer::SetMaxMagnitude(const float& magnitude) {
-  max_magnitude_ = magnitude;
+  max_magnitude_general_ = magnitude;
 }
 
-}  // namespace musicvisual
+auto AudioVisualizer::GenerateBufferPerRange(const size_t& range_size) const
+    -> std::vector<audio::Buffer*> {
+  std::vector<audio::Buffer*> buffer_vector;
+
+  for (size_t frame = 0; frame + range_size < buffer_.getNumFrames();
+       frame += range_size) {
+    auto* temp = new audio::Buffer(range_size, buffer_.getNumChannels());
+
+    // Copy a portion from the original buffer
+    temp->copyOffset(buffer_, range_size, 0, frame);
+    buffer_vector.push_back(temp);
+  }
+
+  // Handle the last frames
+  if (buffer_.getNumFrames() % range_size != 0) {
+    auto* temp = new audio::Buffer(range_size, buffer_.getNumChannels());
+    size_t current_frame =
+        buffer_.getNumFrames() - 1 - (buffer_.getNumFrames() % range_size);
+
+    temp->copyOffset(buffer_, (buffer_.getNumFrames() % range_size), 0,
+                     current_frame);
+    buffer_vector.push_back(temp);
+  }
+
+  return buffer_vector;
+}
+
+}  // namespace visualmusic

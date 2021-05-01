@@ -7,7 +7,7 @@
 #include "cinder/audio/audio.h"
 #include "cinder/gl/gl.h"
 
-namespace musicvisual {
+namespace visualmusic {
 
 using namespace ci;
 using namespace ci::app;
@@ -38,13 +38,13 @@ class MusicVisualApp : public App {
    * Handle user's input key
    * @param event
    */
-  void keyDown( KeyEvent event ) override;
+  void keyDown(KeyEvent event) override;
 
   /**
    * Handle mouse input
    * @param event
    */
-  void mouseDrag( MouseEvent event ) override;
+  void mouseDrag(MouseEvent event) override;
 
  private:
   // Node for sample audio playback
@@ -61,4 +61,4 @@ class MusicVisualApp : public App {
   void DisplayInfoBoard();
 };
 
-}  // namespace musicvisual
+}  // namespace visualmusic

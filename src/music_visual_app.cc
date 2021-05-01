@@ -1,6 +1,6 @@
 #include "music_visual_app.h"
 
-namespace musicvisual {
+namespace visualmusic {
 
 MusicVisualApp::MusicVisualApp() = default;
 
@@ -108,4 +108,4 @@ void MusicVisualApp::DisplayInfoBoard() {
       Color("white"));
 }
 
-}  // namespace musicvisual
+}  // namespace visualmusic
