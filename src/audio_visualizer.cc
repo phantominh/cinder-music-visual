@@ -7,7 +7,8 @@ AudioVisualizer::AudioVisualizer() = default;
 void AudioVisualizer::Load(const audio::Buffer& buffer, const Rectf& bounds,
                            const size_t& sample_rate,
                            const size_t& instant_display_rate_time_domain,
-                           const size_t& general_display_rate_time_domain) {
+                           const size_t& general_display_rate_time_domain,
+                           const size_t &three_dimension_display_rate) {
   buffer_ = buffer;
   bounds_ = bounds;
   sample_rate_ = sample_rate;
@@ -15,6 +16,7 @@ void AudioVisualizer::Load(const audio::Buffer& buffer, const Rectf& bounds,
   // Play rate
   instant_time_domain_display_rate_ = instant_display_rate_time_domain;
   general_time_domain_display_rate_ = general_display_rate_time_domain;
+  three_dimension_display_rate_ = three_dimension_display_rate;
 
   // Boundaries
   general_time_domain_graph_bounds_ = Rectf(
@@ -189,6 +191,21 @@ void AudioVisualizer::Display3DGraph(const size_t& frame) const {
   // Display border
   gl::drawStrokedRect(three_dimension_graph_bounds_);
 
+  // Display multiple frequency domain graph
+  for (size_t i = 0; i < three_dimension_display_rate_; i++) {
+    // Avoid out of script
+
+    if (frame < i * kFrequencyRange) {
+      break;
+    }
+
+    PolyLine2f waveform = CalculateInstantGraphInFrequencyDomain((frame - i * kFrequencyRange), three_dimension_graph_bounds_);
+
+    if (!waveform.getPoints().empty()) {
+      gl::draw(waveform);
+    }
+
+  }
 }
 
 auto AudioVisualizer::CalculateInstantGraphInFrequencyDomain(
@@ -206,7 +223,7 @@ auto AudioVisualizer::CalculateInstantGraphInFrequencyDomain(
     float y;
 
     y = bounds.y2 -
-        ConvertMagnitudeToDisplayableRatio(buffer[f], static_cast<float>(kMaxMagnitude)) * wave_height;
+        ConvertMagnitudeToDisplayableRatio(buffer[f], static_cast<float>(max_magnitude_fft_)) * wave_height;
 
     waveform.push_back(vec2(x, y));
     x += x_scale;
@@ -220,6 +237,8 @@ void AudioVisualizer::ConstructBufferSpectralArray(const size_t& fft_size) {
     throw std::invalid_argument("Range must be a power of 2");
   }
 
+  max_magnitude_fft_ = 0.0f;
+
   std::vector<audio::Buffer*> buffer_arr = GenerateBufferPerRange(fft_size);
   audio::dsp::Fft fft = audio::dsp::Fft(fft_size);
   audio::BufferSpectral* temp;
@@ -228,6 +247,11 @@ void AudioVisualizer::ConstructBufferSpectralArray(const size_t& fft_size) {
     temp = new audio::BufferSpectral(fft_size);
     fft.forward(buffer, temp);
     buffer_spectral_arr_.push_back(temp);
+
+    float max_temp = FindMaximumMagnitude(temp);
+    if (max_magnitude_fft_ < max_temp) {
+      max_magnitude_fft_ = max_temp;
+    }
   }
 }
 
@@ -253,6 +277,16 @@ auto AudioVisualizer::FindMaximumMagnitude(
 
   for (float i : buffer) {
     max_magnitude = std::fmaxf(max_magnitude, abs(i));
+  }
+
+  return max_magnitude;
+}
+
+auto AudioVisualizer::FindMaximumMagnitude(const audio::BufferSpectral *buffer) const -> float {
+  float max_magnitude = 0;
+
+  for (size_t i = 0; i < buffer->getSize(); i++) {
+    max_magnitude = std::fmaxf(max_magnitude, abs(buffer->getData()[i]));
   }
 
   return max_magnitude;

@@ -32,7 +32,8 @@ class AudioVisualizer {
   void Load(const audio::Buffer &buffer, const Rectf &bounds,
             const size_t &sample_rate,
             const size_t &instant_display_rate_time_domain = 20,
-            const size_t &general_display_rate_time_domain = 100);
+            const size_t &general_display_rate_time_domain = 100,
+            const size_t &three_dimension_display_rate = 10);
 
   /**
    * Display everything inside the visualizer at a specific frame
@@ -98,6 +99,9 @@ class AudioVisualizer {
                                              // domain)
   size_t general_time_domain_display_rate_;  // Rate of general display (time
                                              // domain)
+  size_t three_dimension_display_rate_;  // Rate of general display (time
+  // domain)
+
 
   std::vector<float> compressed_buffer_;  // The compressed version of buffer
 
@@ -109,10 +113,10 @@ class AudioVisualizer {
   // Maximum magnitudes
   float max_magnitude_general_;
   float max_magnitude_compressed_;
+  float max_magnitude_fft_;
 
   // Frequency range
-  const size_t kFrequencyRange = static_cast<size_t>(pow(2, 15));
-  const size_t kMaxMagnitude = 1;
+  const size_t kFrequencyRange = static_cast<size_t>(pow(2, 10));
 
   /**
    * Display the instant audio magnitude in time domain at a specific frame
@@ -154,6 +158,13 @@ class AudioVisualizer {
    * @return max magnitude
    */
   auto FindMaximumMagnitude(const std::vector<float> &buffer) const -> float;
+
+  /**
+   * Find the maximum magnitude
+   * @param buffer
+   * @return max magnitude
+   */
+  auto FindMaximumMagnitude(const audio::BufferSpectral *buffer) const -> float;
 
   /**
    * Divide buffer data into smaller buffers (per second)
