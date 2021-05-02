@@ -46,6 +46,11 @@ class MusicVisualApp : public App {
    */
   void mouseDrag(MouseEvent event) override;
 
+  /**
+   * Resize the app
+   */
+  void resize() override;
+
  private:
   // Node for sample audio playback
   audio::BufferPlayerNodeRef buffer_player_node_;

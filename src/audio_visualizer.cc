@@ -8,7 +8,7 @@ void AudioVisualizer::Load(const audio::Buffer& buffer, const Rectf& bounds,
                            const size_t& sample_rate,
                            const size_t& instant_display_rate_time_domain,
                            const size_t& general_display_rate_time_domain,
-                           const size_t &three_dimension_display_rate) {
+                           const size_t& three_dimension_display_rate) {
   buffer_ = buffer;
   bounds_ = bounds;
   sample_rate_ = sample_rate;
@@ -18,6 +18,21 @@ void AudioVisualizer::Load(const audio::Buffer& buffer, const Rectf& bounds,
   general_time_domain_display_rate_ = general_display_rate_time_domain;
   three_dimension_display_rate_ = three_dimension_display_rate;
 
+  ConstructBoundaries();
+
+  ConstructCompressedBuffer();
+  max_magnitude_general_ = FindMaximumMagnitude(buffer_);
+  max_magnitude_compressed_ = FindMaximumMagnitude(compressed_buffer_);
+
+  ConstructBufferSpectralArray(kFrequencyRange);
+}
+
+void AudioVisualizer::Resize(Rectf bounds) {
+  bounds_ = bounds;
+  ConstructBoundaries();
+}
+
+void AudioVisualizer::ConstructBoundaries() {
   // Boundaries
   general_time_domain_graph_bounds_ = Rectf(
       vec2(bounds_.getX1(), bounds_.getY1() + bounds_.getHeight() * 5.5 / 10),
@@ -28,12 +43,6 @@ void AudioVisualizer::Load(const audio::Buffer& buffer, const Rectf& bounds,
   three_dimension_graph_bounds_ = Rectf(
       vec2(bounds_.getX1(), bounds_.getY1() + bounds_.getHeight() * 0.5 / 10),
       vec2(bounds_.getX2(), bounds_.getY1() + bounds_.getHeight() * 5.3 / 10));
-
-  ConstructCompressedBuffer();
-  max_magnitude_general_ = FindMaximumMagnitude(buffer_);
-  max_magnitude_compressed_ = FindMaximumMagnitude(compressed_buffer_);
-
-  ConstructBufferSpectralArray(kFrequencyRange);
 }
 
 void AudioVisualizer::Display(const size_t& frame) const {
@@ -117,14 +126,17 @@ void AudioVisualizer::DisplayGeneralGraphInTimeDomain(
   }
 
   // Display current playtime
-  const float x_scale = general_time_domain_graph_bounds_.getWidth() /
-                        (static_cast<float>(compressed_buffer_.size()));
-  gl::color(Color("red"));
-  auto last_iter = --waveform.end();
+  if (waveform.size() != 0) {
+    gl::color(Color("red"));
 
-  gl::drawStrokedRect(
-      Rectf(last_iter->x, general_time_domain_graph_bounds_.getY1(),
-            last_iter->x + x_scale, general_time_domain_graph_bounds_.getY2()));
+    // Get last buffer
+    auto last_iter = --waveform.end();
+    const float x_scale = general_time_domain_graph_bounds_.getWidth() /
+                          (static_cast<float>(compressed_buffer_.size()));
+    gl::drawStrokedRect(Rectf(
+        last_iter->x, general_time_domain_graph_bounds_.getY1(),
+        last_iter->x + x_scale, general_time_domain_graph_bounds_.getY2()));
+  }
 }
 
 auto AudioVisualizer::CalculateGeneralGraphInTimeDomain(
@@ -199,12 +211,36 @@ void AudioVisualizer::Display3DGraph(const size_t& frame) const {
       break;
     }
 
-    PolyLine2f waveform = CalculateInstantGraphInFrequencyDomain((frame - i * kFrequencyRange), three_dimension_graph_bounds_);
+    vec2 top_left_corner = vec2(
+        three_dimension_graph_bounds_.getX1() +
+            static_cast<float>(i) * three_dimension_graph_bounds_.getWidth() /
+                static_cast<float>(three_dimension_display_rate_),
+        three_dimension_graph_bounds_.getY2() -
+            three_dimension_graph_bounds_.getHeight() / 2 -
+            static_cast<float>(i) *
+                (three_dimension_graph_bounds_.getHeight() / 2) /
+                static_cast<float>(three_dimension_display_rate_));
+
+    vec2 bottom_right_corner = vec2(three_dimension_graph_bounds_.getX2(),
+                                    three_dimension_graph_bounds_.getY2() -
+                                    static_cast<float>(i) *
+                                    (three_dimension_graph_bounds_.getHeight() / 2) /
+                                    static_cast<float>(three_dimension_display_rate_));
+
+    Rectf graph_bounds = Rectf(top_left_corner, bottom_right_corner);
+
+    PolyLine2f waveform = CalculateInstantGraphInFrequencyDomain(
+        (frame - i * kFrequencyRange), graph_bounds);
 
     if (!waveform.getPoints().empty()) {
+      float color_indicator =
+          1.0f - static_cast<float>(i) /
+                     static_cast<float>(three_dimension_display_rate_);
+
+      // Different state of white
+      gl::color(Color(color_indicator, color_indicator, color_indicator));
       gl::draw(waveform);
     }
-
   }
 }
 
@@ -216,14 +252,15 @@ auto AudioVisualizer::CalculateInstantGraphInFrequencyDomain(
   const float x_scale = bounds.getWidth() / static_cast<float>(kFrequencyRange);
   float x = bounds.x1;
 
-  float *buffer = buffer_spectral_arr_[frame / kFrequencyRange]->getData();
+  float* buffer = buffer_spectral_arr_[frame / kFrequencyRange]->getData();
 
   // Construct the graph
   for (size_t f = 0; f < kFrequencyRange; f++) {
     float y;
 
-    y = bounds.y2 -
-        ConvertMagnitudeToDisplayableRatio(buffer[f], static_cast<float>(max_magnitude_fft_)) * wave_height;
+    y = bounds.y2 - ConvertMagnitudeToDisplayableRatio(
+                        buffer[f], static_cast<float>(max_magnitude_fft_)) *
+                        wave_height;
 
     waveform.push_back(vec2(x, y));
     x += x_scale;
@@ -282,7 +319,8 @@ auto AudioVisualizer::FindMaximumMagnitude(
   return max_magnitude;
 }
 
-auto AudioVisualizer::FindMaximumMagnitude(const audio::BufferSpectral *buffer) const -> float {
+auto AudioVisualizer::FindMaximumMagnitude(
+    const audio::BufferSpectral* buffer) const -> float {
   float max_magnitude = 0;
 
   for (size_t i = 0; i < buffer->getSize(); i++) {

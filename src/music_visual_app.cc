@@ -108,4 +108,13 @@ void MusicVisualApp::DisplayInfoBoard() {
       Color("white"));
 }
 
+void MusicVisualApp::resize() {
+  AppBase::resize();
+  visualizer_.Resize(Rectf(
+      static_cast<float>(getWindowBounds().x1) + static_cast<float>(kMargin),
+      static_cast<float>(getWindowBounds().y1) + static_cast<float>(kMargin),
+      static_cast<float>(getWindowBounds().x2) - static_cast<float>(kMargin),
+      static_cast<float>(getWindowBounds().y2) - static_cast<float>(kMargin)));
+}
+
 }  // namespace visualmusic

@@ -33,7 +33,13 @@ class AudioVisualizer {
             const size_t &sample_rate,
             const size_t &instant_display_rate_time_domain = 20,
             const size_t &general_display_rate_time_domain = 100,
-            const size_t &three_dimension_display_rate = 10);
+            const size_t &three_dimension_display_rate = 50);
+
+  /**
+   * Resize the visualizer
+   * @param bounds
+   */
+  void Resize(Rectf bounds);
 
   /**
    * Display everything inside the visualizer at a specific frame
@@ -173,6 +179,8 @@ class AudioVisualizer {
    */
   auto GenerateBufferPerRange(const size_t &range_size) const
       -> std::vector<audio::Buffer *>;
+
+  void ConstructBoundaries();
 };
 
 }  // namespace visualmusic
