@@ -79,7 +79,6 @@ class AudioVisualizer {
   /**
    * Compress the buffer to data per range
    */
-  // TODO: Find a way to test this function
   void ConstructCompressedBuffer();
 
   /**
@@ -105,9 +104,8 @@ class AudioVisualizer {
                                              // domain)
   size_t general_time_domain_display_rate_;  // Rate of general display (time
                                              // domain)
-  size_t three_dimension_display_rate_;  // Rate of general display (time
+  size_t three_dimension_display_rate_;      // Rate of general display (time
   // domain)
-
 
   std::vector<float> compressed_buffer_;  // The compressed version of buffer
 

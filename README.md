@@ -51,6 +51,8 @@ Possible helpful resources:
 
 ## Functionality
 
+You can press Space
+
 This app provides 2 main kinds of audio graphing:
 - **Magnitude - Time:**
   ![Time_Domain_Graph](time_domain_graph.png)

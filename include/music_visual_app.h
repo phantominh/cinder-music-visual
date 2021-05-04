@@ -56,14 +56,21 @@ class MusicVisualApp : public App {
   audio::BufferPlayerNodeRef buffer_player_node_;
   size_t last_saved_frame_;
 
+  // Modify this if necessary
   const float kMargin = 50;
 
+  // Visualizer that handle and draw audio buffers
   AudioVisualizer visualizer_;
 
   /**
    * Display the info board, including: time, frame, fps, etc
    */
   void DisplayInfoBoard();
+
+  /**
+   * Display Guidance
+   */
+  void DisplayGuidance();
 };
 
 }  // namespace visualmusic

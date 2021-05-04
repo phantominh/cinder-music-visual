@@ -9,7 +9,7 @@ void MusicVisualApp::setup() {
 
   // Create a source file and set its output sample rate to match the context
   audio::SourceFileRef source_file =
-      audio::load(app::loadAsset("12 Liebesleid (Love's Sorrow).m4a"),
+      audio::load(app::loadAsset("01 Ballade No. 1 in G Minor, Op. 23.m4a"),
                   ctx->getSampleRate());
 
   // Initialize the buffer player node
@@ -40,6 +40,7 @@ void MusicVisualApp::draw() {
   visualizer_.Display(last_saved_frame_);
 
   DisplayInfoBoard();
+  DisplayGuidance();
 }
 
 void MusicVisualApp::update() {
@@ -106,6 +107,15 @@ void MusicVisualApp::DisplayInfoBoard() {
       state,
       vec2(getWindowBounds().getX2() - 20, getWindowBounds().getY1() + 10),
       Color("white"));
+}
+
+void MusicVisualApp::DisplayGuidance() {
+  gl::drawStringCentered("Press 'Space' to pause the music",
+                         vec2(getWindowCenter().x, getWindowBounds().y2 - 40),
+                         Color("white"));
+  gl::drawStringCentered("Drag the audio box to seek to desired playtime",
+                         vec2(getWindowCenter().x, getWindowBounds().y2 - 20),
+                         Color("white"));
 }
 
 void MusicVisualApp::resize() {

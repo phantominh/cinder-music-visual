@@ -221,11 +221,12 @@ void AudioVisualizer::Display3DGraph(const size_t& frame) const {
                 (three_dimension_graph_bounds_.getHeight() / 2) /
                 static_cast<float>(three_dimension_display_rate_));
 
-    vec2 bottom_right_corner = vec2(three_dimension_graph_bounds_.getX2(),
-                                    three_dimension_graph_bounds_.getY2() -
-                                    static_cast<float>(i) *
-                                    (three_dimension_graph_bounds_.getHeight() / 2) /
-                                    static_cast<float>(three_dimension_display_rate_));
+    vec2 bottom_right_corner =
+        vec2(three_dimension_graph_bounds_.getX2(),
+             three_dimension_graph_bounds_.getY2() -
+                 static_cast<float>(i) *
+                     (three_dimension_graph_bounds_.getHeight() / 2) /
+                     static_cast<float>(three_dimension_display_rate_));
 
     Rectf graph_bounds = Rectf(top_left_corner, bottom_right_corner);
 
