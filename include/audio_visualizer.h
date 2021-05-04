@@ -180,6 +180,9 @@ class AudioVisualizer {
   auto GenerateBufferPerRange(const size_t &range_size) const
       -> std::vector<audio::Buffer *>;
 
+  /**
+   * Construct the boundaries of smaller entities inside the window
+   */
   void ConstructBoundaries();
 };
 
